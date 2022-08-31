@@ -13,8 +13,6 @@ app.use('/uploads', express.static('uploads'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(__dirname));
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   const { method } = req;
@@ -27,10 +25,6 @@ app.use((req, res, next) => {
     return res.end();
   }
   return next();
-});
-
-app.get("/*", function(req, res) {
-  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 const storage = multer.diskStorage({
