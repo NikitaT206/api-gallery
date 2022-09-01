@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const imgModel = require('./models/image');
+const { deleteImage } = require('./controllers/images');
 
 require('dotenv/config');
 
@@ -52,21 +53,16 @@ app.get('/', (req, res, next) => {
 })
 
 app.post("/", upload.single('image'), (req, res, next)=>{
-  if (!req.file) {
-    res.send({code: 500, message: 'not file'})
-  } else {
-    res.send({code: 200, message: 'file upload'})
-  }
-
   const image = {
     name: req.body.name,
     category: req.body.category,
     image: req.file.path
   }
 
-  imgModel.create(image)
-  next()
+  imgModel.create(image).then(image => res.send(image)).catch(err => res.send(err))
 })
+
+app.delete('/:imageId', deleteImage)
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
