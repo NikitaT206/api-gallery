@@ -59,7 +59,7 @@ app.post("/", upload.single('image'), (req, res, next)=>{
     image: req.file.path
   }
 
-  imgModel.create(image).then(image => res.send(image)).catch(err => res.send(err))
+  imgModel.create(image).then(image => res.send(image)).catch(next)
 })
 
 app.delete('/:imageId', deleteImage)
