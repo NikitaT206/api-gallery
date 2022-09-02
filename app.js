@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const imgModel = require('./models/image');
 const { deleteImage } = require('./controllers/images');
-const { Logform } = require('winston');
 const ExifImage = require('exif').ExifImage;
 const sharp = require('sharp')
 
