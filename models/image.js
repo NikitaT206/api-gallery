@@ -13,6 +13,13 @@ var imageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  thumbnail: {
+    type: String,
+    required: true
+  },
+  exif: {
+    type: Object
+  }
 });
 
 module.exports = new mongoose.model('Image', imageSchema);

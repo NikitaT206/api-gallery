@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const imgModel = require('./models/image');
 const { deleteImage } = require('./controllers/images');
+const { Logform } = require('winston');
+const ExifImage = require('exif').ExifImage;
+const sharp = require('sharp')
 
 require('dotenv/config');
 
@@ -52,14 +55,29 @@ app.get('/', (req, res, next) => {
   imgModel.find({}).then(images => res.send(images)).catch(next)
 })
 
-app.post("/", upload.single('image'), (req, res, next)=>{
-  const image = {
-    name: req.body.name,
-    category: req.body.category,
-    image: req.file.path
-  }
+app.post("/", upload.single('image'), (req, res, next) => {
+  const resizeImagePath = 'uploads/' + 'thumbnails-' + new Date().toISOString() + req.file.originalname
 
-  imgModel.create(image).then(image => res.send(image)).catch(next)
+  sharp(req.file.path)
+    .resize(400, 400)
+    .toFile(resizeImagePath, (err, resizeImage) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(resizeImage);
+    }
+  })
+ 
+  new ExifImage({image: req.file.path}, (err, exif) => {
+      const image = {
+        name: req.body.name,
+        category: req.body.category,
+        image: req.file.path,
+        thumbnail: resizeImagePath,
+        exif: exif || null
+      }
+      imgModel.create(image).then(image => res.send(image)).catch(next)
+  })
 })
 
 app.delete('/:imageId', deleteImage)
