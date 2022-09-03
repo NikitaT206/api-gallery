@@ -91,21 +91,24 @@ app.post("/", upload.single('image'), (req, res, next) => {
         const image = {
           name: req.body.name,
           category: req.body.category,
+          fullImage: req.file.path,
           image: resizeImagePath,
           thumbnail: resizeImagePathThumbnail,
           thumbnailSmall: resizeImagePathThumbnailSmall,
           exifData: exif || null,
           uploadDate: new Date().toISOString()
         }
-        imgModel.create(image).then(image => res.send(image)).then(() => {
-          fs.unlink(req.file.path, (err) => {
-            if (err) {
-              console.log('delete error', err)
-            } else {
-              console.log('delete')
-            }
-          })
-        }).catch(next)
+        imgModel.create(image).then(image => res.send(image))
+          // .then(() => {
+          //   fs.unlink(req.file.path, (err) => {
+          //     if (err) {
+          //       console.log('delete error', err)
+          //     } else {
+          //       console.log('delete')
+          //     }
+          //   })
+          // })
+        .catch(next)
       })
     })
 })
