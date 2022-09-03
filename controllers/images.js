@@ -31,6 +31,13 @@ module.exports.deleteImage = ((req, res, next) => {
               console.log('succesfuly delete file')
             }
           })
+          fs.unlink(deleteImage.fullImage, err => {
+            if(err) {
+              console.log(err)
+            } else {
+              console.log('succesfuly delete file')
+            }
+          })
         })
         .catch(next);
       }
