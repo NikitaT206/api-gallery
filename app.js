@@ -64,19 +64,21 @@ app.post("/", upload.single('image'), (req, res, next) => {
         console.log(err);
       } else {
         console.log(resizeImage);
+        new ExifImage({image: req.file.path}, (err, exif) => {
+          const image = {
+            name: req.body.name,
+            category: req.body.category,
+            image: req.file.path,
+            thumbnail: resizeImagePath,
+            exif: exif || null,
+            uploadDate: new Date().toISOString()
+          }
+          imgModel.create(image).then(image => res.send(image)).catch(next)
+      })
     }
   })
  
-  new ExifImage({image: req.file.path}, (err, exif) => {
-      const image = {
-        name: req.body.name,
-        category: req.body.category,
-        image: req.file.path,
-        thumbnail: resizeImagePath,
-        exif: exif || null
-      }
-      imgModel.create(image).then(image => res.send(image)).catch(next)
-  })
+ 
 })
 
 app.delete('/:imageId', deleteImage)

@@ -19,6 +19,10 @@ var imageSchema = new mongoose.Schema({
   },
   exif: {
     type: Object
+  },
+  uploadDate: {
+    type: String,
+    required: true
   }
 });
 
