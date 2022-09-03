@@ -17,6 +17,10 @@ var imageSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  thumbnailSmall: {
+    type: String,
+    required: true
+  },
   exifData: {
     type: Object
   },

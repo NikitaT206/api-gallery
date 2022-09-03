@@ -5,7 +5,9 @@ const multer = require('multer');
 const imgModel = require('./models/image');
 const { deleteImage } = require('./controllers/images');
 const ExifImage = require('exif').ExifImage;
-const sharp = require('sharp')
+const sharp = require('sharp');
+const image = require('./models/image');
+const fs = require('fs')
 
 require('dotenv/config');
 
@@ -56,32 +58,58 @@ app.get('/', (req, res, next) => {
 })
 
 app.post("/", upload.single('image'), (req, res, next) => {
-  const resizeImagePath = 'uploads/' + 'thumbnails-' + new Date().toISOString() + req.file.originalname
+  const resizeImagePath = 'uploads/' + new Date().toISOString() + req.file.originalname
+  const resizeImagePathThumbnail = 'uploads/' + 'thumbnail-' + new Date().toISOString() + req.file.originalname
+  const resizeImagePathThumbnailSmall = 'uploads/' + 'thumbnailSmall-' + new Date().toISOString() + req.file.originalname
 
-  sharp(req.file.path)
-    .resize(400, 400)
-    .toFile(resizeImagePath, (err, resizeImage) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(resizeImage);
-        new ExifImage({image: req.file.path}, (err, exif) => {
-          const image = {
-            name: req.body.name,
-            category: req.body.category,
-            image: req.file.path,
-            thumbnail: resizeImagePath,
-            exifData: exif || null,
-            uploadDate: new Date().toISOString()
-          }
-          imgModel.create(image).then(image => res.send(image)).catch(next)
+  
+  // sharp(req.file.path)
+  //   .resize({width: 1920})
+  //   .toFile(resizeImagePath, (err, resizeImage) => {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       console.log(resizeImage);
+  //       new ExifImage({image: req.file.path}, (err, exif) => {
+  //         const image = {
+  //           name: req.body.name,
+  //           category: req.body.category,
+  //           image: req.file.path,
+  //           thumbnail: resizeImagePath,
+  //           exifData: exif || null,
+  //           uploadDate: new Date().toISOString()
+  //         }
+  //         imgModel.create(image).then(image => res.send(image)).catch(next)
+  //     })
+  //   }
+  // })
+
+    sharp(req.file.path).resize({width: 1920}).toFile(resizeImagePath)
+    sharp(req.file.path).resize({width: 400}).toFile(resizeImagePathThumbnail)
+    sharp(req.file.path).resize({width: 150}).toFile(resizeImagePathThumbnailSmall, () => {
+      new ExifImage({image: req.file.path}, (err, exif) => {
+        const image = {
+          name: req.body.name,
+          category: req.body.category,
+          image: resizeImagePath,
+          thumbnail: resizeImagePathThumbnail,
+          thumbnailSmall: resizeImagePathThumbnailSmall,
+          exifData: exif || null,
+          uploadDate: new Date().toISOString()
+        }
+        imgModel.create(image).then(image => res.send(image)).then(() => {
+          fs.unlink(req.file.path, (err) => {
+            if (err) {
+              console.log('delete error', err)
+            } else {
+              console.log('delete')
+            }
+          })
+        }).catch(next)
       })
-    }
-  })
- 
- 
+    })
 })
-
+ 
 app.delete('/:imageId', deleteImage)
 
 app.listen(PORT, () => {
