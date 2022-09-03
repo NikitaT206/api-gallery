@@ -71,7 +71,7 @@ app.post("/", upload.single('image'), (req, res, next) => {
             category: req.body.category,
             image: req.file.path,
             thumbnail: resizeImagePath,
-            exif: exif || null,
+            exifData: exif || null,
             uploadDate: new Date().toISOString()
           }
           imgModel.create(image).then(image => res.send(image)).catch(next)
