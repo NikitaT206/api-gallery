@@ -88,6 +88,7 @@ app.post("/", upload.single('image'), (req, res, next) => {
     sharp(req.file.path).resize({width: 400}).toFile(resizeImagePathThumbnail)
     sharp(req.file.path).resize({width: 150}).toFile(resizeImagePathThumbnailSmall, () => {
       new ExifImage({image: req.file.path}, (err, exif) => {
+        if (err) next()
         const image = {
           name: req.body.name,
           category: req.body.category,
@@ -110,7 +111,9 @@ app.post("/", upload.single('image'), (req, res, next) => {
           // })
         .catch(next)
       })
+      next()
     })
+  next()
 })
  
 app.delete('/:imageId', deleteImage)
