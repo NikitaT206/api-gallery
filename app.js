@@ -111,9 +111,7 @@ app.post("/", upload.single('image'), (req, res, next) => {
           // })
         .catch(next)
       })
-      next()
     })
-  next()
 })
  
 app.delete('/:imageId', deleteImage)
