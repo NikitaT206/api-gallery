@@ -83,12 +83,11 @@ app.post("/", upload.single('image'), (req, res, next) => {
   //     })
   //   }
   // })
-
+    let exif
     sharp(req.file.path).resize({width: 1920}).toFile(resizeImagePath)
     sharp(req.file.path).resize({width: 400}).toFile(resizeImagePathThumbnail)
     sharp(req.file.path).resize({width: 150}).toFile(resizeImagePathThumbnailSmall, () => {
       new ExifImage({image: req.file.path}, (err, exif) => {
-        if (err) next()
         const image = {
           name: req.body.name,
           category: req.body.category,
